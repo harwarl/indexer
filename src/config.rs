@@ -17,17 +17,14 @@ impl Config {
     /// # Returns
     ///
     /// A fully initialized [`Config`] instance.
-    pub fn new(
-        rpc_url: String,
-        wss_rpc_url: String
-    ) -> Result<Self, ConfigError> {
+    pub fn new(rpc_url: String, wss_rpc_url: String) -> Result<Self, ConfigError> {
         // Validate the urls
         validate_url(&rpc_url, "RPC_URL", &["https", "http"])?;
         validate_url(&wss_rpc_url, "RPC_URL_WSS", &["wss", "ws"])?;
 
         Ok(Self {
             rpc_url,
-            wss_rpc_url
+            wss_rpc_url,
         })
     }
 
@@ -50,10 +47,7 @@ impl Config {
         let rpc_url_wss = env::var("RPC_URL_WSS")
             .map_err(|_| ConfigError::MissingVar("RPC_URL_WSS is missing".to_string()))?;
 
-        Self::new(
-            rpc_url,
-            rpc_url_wss
-        )
+        Self::new(rpc_url, rpc_url_wss)
     }
 }
 
@@ -75,6 +69,6 @@ fn validate_url(url: &str, field: &str, allowed: &[&str]) -> Result<(), ConfigEr
         return Err(ConfigError::InvalidUrl {
             field: field.to_string(),
             message: format!("Expected http/https, got {scheme}"),
-        })
+        });
     }
 }

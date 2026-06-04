@@ -12,9 +12,8 @@ pub enum ConfigError {
     InvalidUrl { field: String, message: String },
 }
 
-
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("Configuration Error: {0}")]
-    Config(#[from] ConfigError)
+    Config(#[from] ConfigError),
 }
