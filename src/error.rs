@@ -1,3 +1,4 @@
+use axum::Error;
 use thiserror::Error;
 
 /// Errors that can occur while loading or validating application configuration.
@@ -27,4 +28,7 @@ pub enum AppError {
 
     #[error("Database Connection Error: {0}")]
     Database(#[from] DatabaseError),
+
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
 }

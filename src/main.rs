@@ -1,11 +1,13 @@
 use crate::{
     config::Config,
     error::AppError,
+    graphql::app::create_app,
     provider::connect::{ProviderType, connect},
 };
 
 pub mod config;
 pub mod error;
+pub mod graphql;
 pub mod provider;
 
 /// Application entry point.
@@ -23,7 +25,7 @@ async fn main() -> Result<(), AppError> {
     tracing::info!("Loaded Env values into config...");
 
     // Load up database
-    let _pool = config.connect_db().await?;
+    let pool = config.connect_db().await?;
     tracing::info!("Postgres DB connected...");
 
     // Initialize providers
@@ -34,6 +36,16 @@ async fn main() -> Result<(), AppError> {
     // Start indexer
 
     // Start GraphQl server
+    let router = create_app(pool.clone()).await;
+
+    // Serve using axum
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+        .await
+        .map_err(anyhow::Error::from)?;
+
+    tracing::info!("Server listening on 0.0.0.0:3000");
+    // Serve using axum
+    axum::serve(listener, router).await.map_err(anyhow::Error::from)?;
 
     // Run both concurrently
     Ok(())
