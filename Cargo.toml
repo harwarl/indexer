@@ -2,5 +2,32 @@
 name = "indexer"
 version = "0.1.0"
 edition = "2024"
+authors = ["Oduwale Awwal <harwarl87@gmail.com>"]
+description = "An Ethereum Indexer built in Rust"
+license = "MIT"
+repository = ""
+keywords = [
+  "ethereum",
+  "blockchain",
+  "indexer",
+  "graphql",
+  "events",
+  "logs",
+  "erc20",
+  "web3"
+]
+categories = [
+  "cryptography::cryptocurrencies",
+  "database",
+  "web-programming"
+]
 
 [dependencies]
+dotenv = "0.15.0"
+tracing = "0.1.44"
+thiserror = "2.0.18"
+serde_json = "1.0.150"
+tracing-subscriber = "0.3.23"
+tokio = {version = "1.52.3", features = ["full"]}
+serde = { version = "1.0.228", features = ["derive"] }
+alloy = { version = "2.0.5", features = ["full", "pubsub"] }
