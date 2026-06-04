@@ -45,7 +45,9 @@ async fn main() -> Result<(), AppError> {
 
     tracing::info!("Server listening on 0.0.0.0:3000");
     // Serve using axum
-    axum::serve(listener, router).await.map_err(anyhow::Error::from)?;
+    axum::serve(listener, router)
+        .await
+        .map_err(anyhow::Error::from)?;
 
     // Run both concurrently
     Ok(())
