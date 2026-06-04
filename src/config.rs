@@ -11,6 +11,7 @@ pub struct Config {
     pub rpc_url: String,
     pub wss_rpc_url: String,
     pub database_url: String,
+    pub chain_id: u32,
 }
 
 impl Config {
@@ -23,6 +24,7 @@ impl Config {
         rpc_url: String,
         wss_rpc_url: String,
         database_url: String,
+        chain_id: u32,
     ) -> Result<Self, ConfigError> {
         // Validate the urls
         validate_url(&rpc_url, "RPC_URL", &["https", "http"])?;
@@ -33,6 +35,7 @@ impl Config {
             rpc_url,
             wss_rpc_url,
             database_url,
+            chain_id,
         })
     }
 
@@ -58,7 +61,12 @@ impl Config {
         let database_url =
             env::var("DATABASE_URL").unwrap_or("https://Someurl.com/indexer".to_string());
 
-        Self::new(rpc_url, rpc_url_wss, database_url)
+        let chain_id: u32 = env::var("CHAIN_ID")
+            .unwrap_or_else(|_| "11155111".to_string())
+            .parse()
+            .map_err(|_| ConfigError::InvalidChainId)?;
+
+        Self::new(rpc_url, rpc_url_wss, database_url, chain_id)
     }
 
     /// Establishes a connection pool to the PostgreSQL database and runs all pending migrations.

@@ -54,7 +54,7 @@ async fn main() -> Result<(), AppError> {
             tracing::info!("Shutdown signal received");
         }
     }
-    
+
     Ok(())
 }
 

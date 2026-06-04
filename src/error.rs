@@ -11,6 +11,9 @@ pub enum ConfigError {
     /// Invalid Url for one of the environmental variables
     #[error("Invalid URL format for {field}: {message}")]
     InvalidUrl { field: String, message: String },
+
+    #[error("Invalid Chain Id")]
+    InvalidChainId,
 }
 
 #[derive(Debug, Error)]
