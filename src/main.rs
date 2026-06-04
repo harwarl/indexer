@@ -1,4 +1,8 @@
-use crate::{config::Config, error::AppError, provider::connect::{self, ProviderType, connect}};
+use crate::{
+    config::Config,
+    error::AppError,
+    provider::connect::{ProviderType, connect},
+};
 
 pub mod config;
 pub mod error;
@@ -19,17 +23,13 @@ async fn main() -> Result<(), AppError> {
     tracing::info!("Loaded Env values into config...");
 
     // Load up database
-
-
+    let _pool = config.connect_db().await?;
+    tracing::info!("Postgres DB connected...");
 
     // Initialize providers
     let _wss_provider = connect(config.wss_rpc_url.as_str(), ProviderType::WSS).await;
     let _http_provider = connect(config.rpc_url.as_str(), ProviderType::HTTP).await;
     tracing::info!("Initialized Providers...");
-
-
-
-
 
     Ok(())
 }

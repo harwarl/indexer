@@ -1,14 +1,16 @@
 use std::env;
 
+use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use url::Url;
 
-use crate::error::ConfigError;
+use crate::error::{ConfigError, DatabaseError};
 
 /// Application configuration loaded from environment variables or other sources.
 #[derive(Debug)]
 pub struct Config {
     pub rpc_url: String,
     pub wss_rpc_url: String,
+    pub database_url: String,
 }
 
 impl Config {
@@ -17,14 +19,20 @@ impl Config {
     /// # Returns
     ///
     /// A fully initialized [`Config`] instance.
-    pub fn new(rpc_url: String, wss_rpc_url: String) -> Result<Self, ConfigError> {
+    pub fn new(
+        rpc_url: String,
+        wss_rpc_url: String,
+        database_url: String,
+    ) -> Result<Self, ConfigError> {
         // Validate the urls
         validate_url(&rpc_url, "RPC_URL", &["https", "http"])?;
         validate_url(&wss_rpc_url, "RPC_URL_WSS", &["wss", "ws"])?;
+        validate_url(&database_url, "DATABASE_URL", &["https"])?;
 
         Ok(Self {
             rpc_url,
             wss_rpc_url,
+            database_url,
         })
     }
 
@@ -47,7 +55,28 @@ impl Config {
         let rpc_url_wss = env::var("RPC_URL_WSS")
             .map_err(|_| ConfigError::MissingVar("RPC_URL_WSS is missing".to_string()))?;
 
-        Self::new(rpc_url, rpc_url_wss)
+        let database_url =
+            env::var("DATABASE_URL").unwrap_or("https://Someurl.com/indexer".to_string());
+
+        Self::new(rpc_url, rpc_url_wss, database_url)
+    }
+
+    /// Establishes a connection pool to the PostgreSQL database and runs all pending migrations.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DatabaseError::ConnectionFailed`] if the pool cannot connect to the database,
+    /// or [`DatabaseError::MigrationFailed`] if any migration fails to apply.
+    pub async fn connect_db(self: &Self) -> Result<Pool<Postgres>, DatabaseError> {
+        let pool = PgPoolOptions::new()
+            .connect(&self.database_url)
+            .await
+            .map_err(|e| DatabaseError::ConnectionFailed(e.to_string()))?;
+        sqlx::migrate!("db/migrations")
+            .run(&pool)
+            .await
+            .map_err(|e| DatabaseError::MigrationFailed(e.to_string()))?;
+        Ok(pool)
     }
 }
 
