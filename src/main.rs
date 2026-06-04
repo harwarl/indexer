@@ -44,12 +44,17 @@ async fn main() -> Result<(), AppError> {
         .map_err(anyhow::Error::from)?;
 
     tracing::info!("Server listening on 0.0.0.0:3000");
-    // Serve using axum
-    axum::serve(listener, router)
-        .await
-        .map_err(anyhow::Error::from)?;
 
-    // Run both concurrently
+    // Run concurrently
+    tokio::select! {
+        result = axum::serve(listener, router) => {
+            drop(result);
+        }
+        _ = tokio::signal::ctrl_c() => {
+            tracing::info!("Shutdown signal received");
+        }
+    }
+    
     Ok(())
 }
 
