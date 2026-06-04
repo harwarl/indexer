@@ -15,6 +15,6 @@ pub enum ConfigError {
 
 #[derive(Debug, Error)]
 pub enum AppError {
-    #[error("Configguration Error: {0}")]
+    #[error("Configuration Error: {0}")]
     Config(#[from] ConfigError)
 }
