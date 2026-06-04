@@ -23,6 +23,7 @@ categories = [
 ]
 
 [dependencies]
+url = "2.5.8"
 dotenv = "0.15.0"
 tracing = "0.1.44"
 thiserror = "2.0.18"
