@@ -31,5 +31,14 @@ async fn main() -> Result<(), AppError> {
     let _http_provider = connect(config.rpc_url.as_str(), ProviderType::HTTP).await;
     tracing::info!("Initialized Providers...");
 
+    // Start indexer
+
+    // Start GraphQl server
+
+    // Run both concurrently
     Ok(())
 }
+
+//
+// sigal::ctrl_c().await.expect()
+//

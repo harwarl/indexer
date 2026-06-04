@@ -27,7 +27,7 @@ impl Config {
         // Validate the urls
         validate_url(&rpc_url, "RPC_URL", &["https", "http"])?;
         validate_url(&wss_rpc_url, "RPC_URL_WSS", &["wss", "ws"])?;
-        validate_url(&database_url, "DATABASE_URL", &["https"])?;
+        validate_url(&database_url, "DATABASE_URL", &["postgres"])?;
 
         Ok(Self {
             rpc_url,
