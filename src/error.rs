@@ -25,12 +25,21 @@ pub enum DatabaseError {
 }
 
 #[derive(Debug, Error)]
+pub enum IndexerError{
+    #[error("Failed to subscribe to blocks")]
+    BlockSubscriptionFailed
+}
+
+#[derive(Debug, Error)]
 pub enum AppError {
     #[error("Configuration Error: {0}")]
     Config(#[from] ConfigError),
 
     #[error("Database Connection Error: {0}")]
     Database(#[from] DatabaseError),
+
+    #[error("Indexer Error: {0}")]
+    Indexer(#[from] IndexerError),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),

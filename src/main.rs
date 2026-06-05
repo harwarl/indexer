@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     config::Config,
     error::AppError,
@@ -9,6 +11,7 @@ pub mod config;
 pub mod error;
 pub mod graphql;
 pub mod provider;
+pub mod indexer;
 
 /// Application entry point.
 ///
@@ -29,11 +32,13 @@ async fn main() -> Result<(), AppError> {
     tracing::info!("Postgres DB connected...");
 
     // Initialize providers
-    let _wss_provider = connect(config.wss_rpc_url.as_str(), ProviderType::WSS).await;
-    let _http_provider = connect(config.rpc_url.as_str(), ProviderType::HTTP).await;
+    let wss_provider = connect(&config.wss_rpc_url.as_str(), ProviderType::WSS).await;
+    let http_provider = connect(&config.rpc_url.as_str(), ProviderType::HTTP).await;
     tracing::info!("Initialized Providers...");
 
     // Start indexer
+    let indexer = indexer::block::start(wss_provider, http_provider, pool.clone());
+    tracing::info!("Indexer started...");
 
     // Start GraphQl server
     let router = create_app(pool.clone()).await;
@@ -49,6 +54,11 @@ async fn main() -> Result<(), AppError> {
     tokio::select! {
         result = axum::serve(listener, router) => {
             drop(result);
+        }
+        result = indexer => {
+            if let Err(e) = result {
+                tracing::error!("Indexer crashed: {e}");
+            }
         }
         _ = tokio::signal::ctrl_c() => {
             tracing::info!("Shutdown signal received");

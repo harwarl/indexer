@@ -13,7 +13,7 @@ pub enum ProviderType {
 ///
 /// # Panics
 /// Panics if the connection cannot be established
-pub async fn connect(url: &str, provider_type: ProviderType) -> impl Provider {
+pub async fn connect(url: &str, provider_type: ProviderType) -> impl Provider + 'static {
     match provider_type {
         ProviderType::HTTP => ProviderBuilder::new()
             .connect(url)
