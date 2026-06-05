@@ -25,9 +25,9 @@ pub enum DatabaseError {
 }
 
 #[derive(Debug, Error)]
-pub enum IndexerError{
+pub enum IndexerError {
     #[error("Failed to subscribe to blocks")]
-    BlockSubscriptionFailed
+    BlockSubscriptionFailed,
 }
 
 #[derive(Debug, Error)]
@@ -40,6 +40,9 @@ pub enum AppError {
 
     #[error("Indexer Error: {0}")]
     Indexer(#[from] IndexerError),
+
+    #[error("Provider Error: {0}")]
+    Provider(String),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),

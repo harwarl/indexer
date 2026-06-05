@@ -37,3 +37,4 @@ serde = { version = "1.0.228", features = ["derive"] }
 alloy = { version = "2.0.5", features = ["full", "pubsub"] }
 sqlx = { version = "0.8.6", features = ["postgres", "derive", "macros", "runtime-tokio-rustls"] }
 anyhow = "1.0.102"
+futures-util = "0.3.32"

@@ -1,17 +1,18 @@
-use std::sync::Arc;
+use alloy::providers::Provider;
 
 use crate::{
     config::Config,
     error::AppError,
     graphql::app::create_app,
-    provider::connect::{ProviderType, connect},
+    provider::connect::{connect, connect_wss},
 };
+use futures_util::StreamExt;
 
 pub mod config;
 pub mod error;
 pub mod graphql;
-pub mod provider;
 pub mod indexer;
+pub mod provider;
 
 /// Application entry point.
 ///
@@ -31,13 +32,8 @@ async fn main() -> Result<(), AppError> {
     let pool = config.connect_db().await?;
     tracing::info!("Postgres DB connected...");
 
-    // Initialize providers
-    let wss_provider = connect(&config.wss_rpc_url.as_str(), ProviderType::WSS).await;
-    let http_provider = connect(&config.rpc_url.as_str(), ProviderType::HTTP).await;
-    tracing::info!("Initialized Providers...");
-
     // Start indexer
-    let indexer = indexer::block::start(wss_provider, http_provider, pool.clone());
+    let indexer = indexer::listener::start(&config, pool.clone());
     tracing::info!("Indexer started...");
 
     // Start GraphQl server
@@ -67,7 +63,3 @@ async fn main() -> Result<(), AppError> {
 
     Ok(())
 }
-
-//
-// sigal::ctrl_c().await.expect()
-//
