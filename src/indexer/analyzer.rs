@@ -41,8 +41,8 @@ where
         let data = log.data().data.to_string();
         let address = log.address();
         let tx_hash = log.transaction_hash.map(|h| h.to_string());
-        let log_index = log.log_index;
-        let tx_index = log.transaction_index;
+        let log_index = log.log_index.map(|i| i as i64);
+        let tx_index = log.transaction_index.map(|i| i as i64);
 
         raw_logs.push(RawLogRow {
             block_number: block_number as i64,
@@ -97,7 +97,7 @@ where
         }
     }
 
-    // TODO: Save in Batches 
+    // TODO: Save in Batches
 
     tracing::info!(
         "Block {block_number}: {} logs, {} transfers, {} approvals",

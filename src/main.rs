@@ -1,6 +1,7 @@
 use crate::{config::Config, error::AppError, graphql::app::create_app};
 
 pub mod config;
+pub mod db;
 pub mod decoder;
 pub mod error;
 pub mod graphql;
@@ -8,7 +9,6 @@ pub mod indexer;
 pub mod provider;
 pub mod types;
 pub mod utils;
-pub mod db;
 
 /// Application entry point.
 ///

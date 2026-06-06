@@ -22,6 +22,8 @@ pub enum DatabaseError {
     ConnectionFailed(String),
     #[error("Migration Failed: {0}")]
     MigrationFailed(String),
+    #[error("Database Error: {0}")]
+    Error(String),
 }
 
 #[derive(Debug, Error)]
