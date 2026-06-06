@@ -1,18 +1,13 @@
-use alloy::providers::Provider;
-
-use crate::{
-    config::Config,
-    error::AppError,
-    graphql::app::create_app,
-    provider::connect::{connect, connect_wss},
-};
-use futures_util::StreamExt;
+use crate::{config::Config, error::AppError, graphql::app::create_app};
 
 pub mod config;
+pub mod decoder;
 pub mod error;
 pub mod graphql;
 pub mod indexer;
 pub mod provider;
+pub mod types;
+pub mod utils;
 
 /// Application entry point.
 ///
@@ -40,11 +35,11 @@ async fn main() -> Result<(), AppError> {
     let router = create_app(pool.clone()).await;
 
     // Serve using axum
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:4000")
         .await
         .map_err(anyhow::Error::from)?;
 
-    tracing::info!("Server listening on 0.0.0.0:3000");
+    tracing::info!("Server listening on 0.0.0.0:4000");
 
     // Run concurrently
     tokio::select! {

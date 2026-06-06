@@ -44,6 +44,9 @@ pub enum AppError {
     #[error("Provider Error: {0}")]
     Provider(String),
 
+    #[error("Decoder Error: {0}")]
+    Decode(String),
+
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

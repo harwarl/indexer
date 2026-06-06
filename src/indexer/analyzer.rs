@@ -1,11 +1,7 @@
-use alloy::{
-    network::TransactionResponse,
-    providers::Provider,
-    rpc::types::{Filter, TransactionReceipt},
-};
+use alloy::{providers::Provider, rpc::types::Filter};
 use sqlx::PgPool;
 
-use crate::error::AppError;
+use crate::{decoder, error::AppError, types::DecodeResult};
 
 pub async fn run<P>(http_provider: P, db: PgPool, block_number: u64) -> Result<(), AppError>
 where
@@ -31,7 +27,7 @@ where
 
     let block_timestamp = block.header.timestamp;
 
-    for log in logs {
+    for log in &logs {
         let topics = log.topics();
         let data = log.data();
         let address = log.address();
@@ -40,7 +36,27 @@ where
         let tx_index = log.transaction_index;
 
         // TODO: decode Log
-        // TODO: save to DB
+        match decoder::decode::try_decode(log) {
+            DecodeResult::Approval(approval) => {
+                tracing::info!(
+                    "Approval: {} approved {} ({})",
+                    approval.owner,
+                    approval.spender,
+                    approval.value
+                );
+                // save to DB
+            }
+            DecodeResult::Transfer(transfer) => {
+                tracing::info!(
+                    "Transfer: {} → {} ({})",
+                    transfer.from,
+                    transfer.to,
+                    transfer.value
+                );
+                // save to DB
+            }
+            DecodeResult::Unknown => {}
+        }
     }
 
     Ok(())
