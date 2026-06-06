@@ -28,13 +28,14 @@ pub async fn start(config: &Config, db: PgPool) -> Result<(), AppError> {
 
     while let Some(block) = stream.next().await {
         let block_number = block.number;
+
         tracing::info!("Block Number: {block_number}");
 
         let http_provider = Arc::clone(&http_provider);
         let db = db.clone();
 
         tokio::spawn(async move {
-            if let Err(e) = analyzer::run(http_provider, db).await {
+            if let Err(e) = analyzer::run(http_provider, db, block_number).await {
                 tracing::error!("Analyzer error on block {block_number}: {e}");
             }
         });
