@@ -8,6 +8,7 @@ pub mod indexer;
 pub mod provider;
 pub mod types;
 pub mod utils;
+pub mod db;
 
 /// Application entry point.
 ///
