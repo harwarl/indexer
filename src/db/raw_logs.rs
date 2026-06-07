@@ -18,21 +18,27 @@ pub async fn insert_raw_logs(db: &PgPool, rows: &[RawLogRow]) -> Result<(), AppE
     let log_indexes: Vec<Option<i64>> = rows.iter().map(|r| r.log_index).collect();
     let addresses: Vec<String> = rows.iter().map(|r| r.address.clone()).collect();
     let data: Vec<String> = rows.iter().map(|r| r.data.clone()).collect();
+    let topics: Vec<String> = rows
+        .iter()
+        .map(|t| t.topics.to_string())
+        .collect::<Vec<_>>();
+    // .join(",");
 
     sqlx::query!(
-        r#"
-        INSERT INTO raw_logs (block_number, block_timestamp, tx_hash, tx_index, log_index, address, data)
-        SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::text[], $4::bigint[], $5::bigint[], $6::text[], $7::text[])
-        ON CONFLICT (tx_hash, log_index) DO NOTHING
-        "#,
-        &block_numbers,
-        &block_timestamps,
-        &tx_hashes as &[Option<String>],
-        &tx_indexes as &[Option<i64>],
-        &log_indexes as &[Option<i64>],
-        &addresses,
-        &data,
-    )
+    r#"
+    INSERT INTO raw_logs (block_number, block_timestamp, tx_hash, tx_index, log_index, address, topics, data)
+    SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::text[], $4::bigint[], $5::bigint[], $6::text[], $7::text[], $8::text[])
+    ON CONFLICT (tx_hash, log_index) DO NOTHING
+    "#,
+    &block_numbers,
+    &block_timestamps,
+    &tx_hashes as &[Option<String>],
+    &tx_indexes as &[Option<i64>],
+    &log_indexes as &[Option<i64>],
+    &addresses,
+    &topics,
+    &data,
+)
     .execute(db)
     .await
     .map_err(|e| DatabaseError::Error(e.to_string()))?;

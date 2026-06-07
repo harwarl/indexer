@@ -7,6 +7,7 @@ pub mod error;
 pub mod graphql;
 pub mod indexer;
 pub mod provider;
+pub mod tokens;
 pub mod types;
 pub mod utils;
 

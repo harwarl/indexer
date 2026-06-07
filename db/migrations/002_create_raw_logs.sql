@@ -1,4 +1,4 @@
-CREATE TABLE raw_logs (
+CREATE TABLE IF NOT EXISTS raw_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     block_number BIGINT NOT NULL,
     block_timestamp BIGINT NOT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE raw_logs (
     tx_index BIGINT,
     log_index BIGINT,
     address TEXT NOT NULL, 
-    topics TEXT[] NOT NULL,
+    topics TEXT NOT NULL,
     data TEXT NOT NULL,
     indexed_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (tx_hash, log_index)

@@ -14,7 +14,7 @@ pub struct RawLogRow {
     pub log_index: Option<i64>,
     pub tx_index: Option<i64>,
     pub address: String,
-    pub topics: Vec<String>,
+    pub topics: String,
     pub data: String,
 }
 
@@ -38,4 +38,14 @@ pub struct ApprovalRow {
     pub owner: String,
     pub spender: String,
     pub value: String,
+}
+
+#[derive(Debug)]
+pub struct TokenRow {
+    pub address: String,
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub decimals: Option<i32>,
+    pub first_seen_block: i64,
+    pub last_seen_block: i64,
 }

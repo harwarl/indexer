@@ -1,10 +1,13 @@
-use alloy::{providers::Provider, rpc::types::Filter};
+use std::{str::FromStr, sync::Arc};
+
+use alloy::{primitives::Address, providers::Provider, rpc::types::Filter};
 use sqlx::PgPool;
 
 use crate::{
-    decoder,
+    db, decoder,
     error::AppError,
-    types::{ApprovalRow, DecodeResult, RawLogRow, TransferRow},
+    tokens::fetch::fetch_token_meta,
+    types::{ApprovalRow, DecodeResult, RawLogRow, TokenRow, TransferRow},
 };
 
 pub async fn run<P>(http_provider: P, db: PgPool, block_number: u64) -> Result<(), AppError>
@@ -55,16 +58,9 @@ where
             data,
         });
 
-        // TODO: decode Log
+        // decode the log
         match decoder::decode::try_decode(log) {
             DecodeResult::Approval(approval) => {
-                tracing::info!(
-                    "Approval: {} approved {} ({})",
-                    approval.owner,
-                    approval.spender,
-                    approval.value
-                );
-                // save to DB
                 approval_logs.push(ApprovalRow {
                     block_number: block_number as i64,
                     block_timestamp: block_timestamp as i64,
@@ -76,13 +72,6 @@ where
                 });
             }
             DecodeResult::Transfer(transfer) => {
-                tracing::info!(
-                    "Transfer: {} → {} ({})",
-                    transfer.from,
-                    transfer.to,
-                    transfer.value
-                );
-                // save to DB
                 transfer_logs.push(TransferRow {
                     block_number: block_number as i64,
                     block_timestamp: block_timestamp as i64,
@@ -94,10 +83,47 @@ where
                 });
             }
             DecodeResult::Unknown => {}
+        };
+
+        // inside the for log in &logs loop, after decoding:
+        let token_address = address.to_string();
+
+        if !db::tokens::token_exists(&db, &token_address).await? {
+            let meta = fetch_token_meta(&http_provider, address).await;
+
+            db::tokens::upsert_token(
+                &db,
+                &TokenRow {
+                    address: token_address.clone(),
+                    name: meta.name,
+                    symbol: meta.symbol,
+                    decimals: meta.decimals,
+                    first_seen_block: block_number as i64,
+                    last_seen_block: block_number as i64,
+                },
+            )
+            .await?;
+        } else {
+            // just update last_seen_block
+            db::tokens::upsert_token(
+                &db,
+                &TokenRow {
+                    address: token_address.clone(),
+                    name: None,
+                    symbol: None,
+                    decimals: None,
+                    first_seen_block: block_number as i64,
+                    last_seen_block: block_number as i64,
+                },
+            )
+            .await?;
         }
     }
 
-    // TODO: Save in Batches
+    // Save in bulk
+    db::raw_logs::insert_raw_logs(&db, &raw_logs).await?;
+    db::transfers::insert_transfers(&db, &transfer_logs).await?;
+    db::approvals::insert_approvals(&db, &approval_logs).await?;
 
     tracing::info!(
         "Block {block_number}: {} logs, {} transfers, {} approvals",

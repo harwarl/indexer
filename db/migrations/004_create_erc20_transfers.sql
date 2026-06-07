@@ -1,10 +1,10 @@
-CREATE TABLE erc20_transfers (
+CREATE TABLE IF NOT EXISTS  erc20_transfers (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     raw_log_id      UUID REFERENCES raw_logs(id) ON DELETE CASCADE,
     block_number    BIGINT NOT NULL,
     block_timestamp BIGINT NOT NULL,
     tx_hash         TEXT NOT NULL,
-    address         TEXT NOT NULL, -- token contract
+    address TEXT NOT NULL REFERENCES tokens(address),
     from_address    TEXT NOT NULL,
     to_address      TEXT NOT NULL,
     value           NUMERIC NOT NULL,

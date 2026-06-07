@@ -1,8 +1,7 @@
-use std::sync::{Arc, Mutex};
-
 use alloy::providers::Provider;
 use futures_util::StreamExt;
 use sqlx::PgPool;
+use std::sync::Arc;
 
 use crate::{
     config::Config,
