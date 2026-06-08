@@ -2,11 +2,11 @@ use async_graphql::{EmptyMutation, EmptySubscription, MergedObject, Schema};
 use sqlx::PgPool;
 
 use crate::graphql::resolvers::{
-    approvals::ApprovalQuery, basic::Query, token::TokenQuery, transfers::TransferQuery,
+    approvals::ApprovalQuery, basic::Query, raw_logs::RawLogsQuery, token::TokenQuery, transfers::TransferQuery
 };
 
 #[derive(MergedObject, Default)]
-pub struct QueryRoot(Query, TokenQuery, ApprovalQuery, TransferQuery);
+pub struct QueryRoot(Query, TokenQuery, ApprovalQuery, TransferQuery, RawLogsQuery);
 
 pub type AppSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 

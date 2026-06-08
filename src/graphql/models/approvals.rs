@@ -1,5 +1,7 @@
 use async_graphql::Object;
 
+use crate::graphql::models::raw_logs::RawLog;
+
 #[derive(Debug, Clone)]
 pub struct Approval {
     pub block_number: i64,

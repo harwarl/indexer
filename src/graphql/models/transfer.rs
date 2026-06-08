@@ -8,6 +8,7 @@ pub struct Transfer {
     pub address: String,
     pub from_address: String,
     pub to_address: String,
+    pub log_index: Option<i64>,
     pub value: String,
 }
 

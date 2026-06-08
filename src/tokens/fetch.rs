@@ -16,7 +16,6 @@ pub async fn fetch_token_meta<P: Provider + Clone>(provider: P, address: Address
         .call()
         .await
         .unwrap_or_else(|_| "Unknown".to_string());
-    dbg!(&name);
     let symbol = contract
         .symbol()
         .call()
