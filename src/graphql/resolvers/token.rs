@@ -5,7 +5,11 @@ pub struct TokenQuery;
 
 #[Object]
 impl TokenQuery {
-    async fn address(&self ) -> &str {
-        "Some Some"
+    async fn tokens(&self) -> &str {
+        todo!()
+    }
+
+    async fn token(&self) -> &str {
+        todo!()
     }
 }

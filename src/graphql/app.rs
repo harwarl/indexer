@@ -25,7 +25,10 @@ pub async fn create_app(db: PgPool) -> Router {
 ///
 /// Registers the GraphQL endpoint and associated services.
 pub async fn create_router(schema: AppSchema) -> Router {
-    Router::new().route("/graphql", get(graphql_playground).post_service(GraphQL::new(schema)))
+    Router::new().route(
+        "/graphql",
+        get(graphql_playground).post_service(GraphQL::new(schema)),
+    )
 }
 
 /// Serves the GraphiQL web interface.
