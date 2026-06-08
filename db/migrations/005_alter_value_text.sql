@@ -1,0 +1,2 @@
+ALTER TABLE erc20_approvals ALTER COLUMN value TYPE TEXT;
+ALTER TABLE erc20_transfers ALTER COLUMN value TYPE TEXT;

@@ -22,6 +22,7 @@ pub struct RawLogRow {
 pub struct TransferRow {
     pub block_timestamp: i64,
     pub block_number: i64,
+    pub log_index: i64,
     pub tx_hash: String,
     pub address: String,
     pub from_address: String,
@@ -33,6 +34,7 @@ pub struct TransferRow {
 pub struct ApprovalRow {
     pub block_number: i64,
     pub block_timestamp: i64,
+    pub log_index: i64,
     pub tx_hash: String,
     pub address: String,
     pub owner: String,

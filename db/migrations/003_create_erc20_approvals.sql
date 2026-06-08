@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS erc20_approvals (
     block_number    BIGINT NOT NULL,
     block_timestamp BIGINT NOT NULL,
     tx_hash         TEXT NOT NULL,
+    log_index       BIGINT,
     address TEXT NOT NULL REFERENCES tokens(address),
     owner           TEXT NOT NULL,
     spender         TEXT NOT NULL,

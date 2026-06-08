@@ -63,6 +63,7 @@ where
             DecodeResult::Approval(approval) => {
                 approval_logs.push(ApprovalRow {
                     block_number: block_number as i64,
+                    log_index: log_index.unwrap_or_default(),
                     block_timestamp: block_timestamp as i64,
                     tx_hash: tx_hash.unwrap_or_default(),
                     address: address.to_string(),
@@ -75,6 +76,7 @@ where
                 transfer_logs.push(TransferRow {
                     block_number: block_number as i64,
                     block_timestamp: block_timestamp as i64,
+                    log_index: log_index.unwrap_or_default(),
                     tx_hash: tx_hash.unwrap_or_default(),
                     address: address.to_string(),
                     from_address: transfer.from.to_string(),

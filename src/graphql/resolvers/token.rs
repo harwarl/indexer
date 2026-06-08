@@ -1,7 +1,10 @@
 use async_graphql::{Context, Object, Result as GqlResult};
 use sqlx::PgPool;
 
-use crate::{db::tokens::{get_token, get_tokens}, graphql::models::token::Token};
+use crate::{
+    db::tokens::{get_token, get_tokens},
+    graphql::models::token::Token,
+};
 
 #[derive(Default)]
 pub struct TokenQuery;

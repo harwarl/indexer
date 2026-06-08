@@ -17,11 +17,12 @@ pub async fn insert_transfers(db: &PgPool, rows: &[TransferRow]) -> Result<(), A
     let from_addresses: Vec<String> = rows.iter().map(|r| r.from_address.clone()).collect();
     let to_addresses: Vec<String> = rows.iter().map(|r| r.to_address.clone()).collect();
     let values: Vec<String> = rows.iter().map(|r| r.value.clone()).collect();
+    let log_indexes: Vec<i64> = rows.iter().map(|r| r.log_index).collect();
 
     sqlx::query!(
         r#"
-        INSERT INTO erc20_transfers (block_number, block_timestamp, tx_hash, address, from_address, to_address, value)
-        SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[]::numeric[])
+        INSERT INTO erc20_transfers (block_number, block_timestamp, tx_hash, address, from_address, to_address, value, log_index)
+        SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[]::numeric[], $8::bigint[])
         ON CONFLICT DO NOTHING
         "#,
         &block_numbers,
@@ -31,6 +32,7 @@ pub async fn insert_transfers(db: &PgPool, rows: &[TransferRow]) -> Result<(), A
         &from_addresses,
         &to_addresses,
         &values,
+        &log_indexes
     )
     .execute(db)
     .await
